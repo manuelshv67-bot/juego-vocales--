@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de las Vocales</title>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(-45deg, #ffecd2, #fcb69f, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: fondoAnimado 15s ease infinite;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        @keyframes fondoAnimado {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 🖼️ FONDO DE INICIO */
+        #pantallaInicio {
+            background-image: url('https://www.bing.com/th/id/OIP.t9Jyp0aAeneae-gjnc0gCAHaEz?w=253&h=211&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2'); 
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        #pantallaInicio h1 {
+            font-size: 3rem;
+            color: #ff3399;
+            text-shadow: 2px 2px 5px #fff;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 15px;
+            animation: parpadeo 1s infinite;
+            border: 5px solid #ffcc00;
+        }
+
+        @keyframes parpadeo {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        #btnComenzar {
+            margin-top: 20px;
+            background: linear-gradient(to right, #ffcc00, #ff6699);
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 15px #ff99cc, 0 0 5px #ffcc00 inset;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        button {
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        #instrucciones {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            text-align: right;
+            font-size: 1.5rem;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 5px 10px;
+            border-radius: 10px;
+            z-index: 10;
+        }
+        #instrucciones h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .marcadores p {
+            margin: 5px 0;
+        }
+
+        #btnPausa {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2.2rem;
+            background: rgba(255, 255, 255, 0.7);
+            border: 3px solid #6c5ce7;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            padding: 0;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 0 10px #6c5ce7;
+        }
+
+        #menuPausa {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #menuPausa .menu {
+            background: white;
+            padding: 30px 50px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.8);
+            border: 7px solid hotpink;
+            animation: aparecer 0.5s ease;
+        }
+        #menuPausa button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        #btnSeguir { background-color: #00b894; color: white; }
+        #btnReiniciar { background-color: #e17055; color: white; }
+
+        @keyframes aparecer {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* 🖼️ FONDO DE JUEGO */
+        #zonaJuego {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-image: url('https://static.vecteezy.com/system/resources/previews/002/383/471/non_2x/happy-cute-cartoon-school-children-vector.jpg'); 
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .burbuja {
+            position: absolute;
+            font-size: 2.5rem;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff, var(--bubble-color, #99ccff));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4), 0 0 5px white inset;
+            animation: flotar 8s infinite ease-in-out, aparecerBurbuja 0.5s ease-out;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            font-weight: bolder;
+            color: #333;
+        }
+        @keyframes aparecerBurbuja {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes flotar {
+            0% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(15px, -30px) scale(1.05); }
+            50% { transform: translate(-15px, -60px) scale(1.1); }
+            75% { transform: translate(8px, -30px) scale(1.05); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .explotar {
+            transform: scale(0.2) !important;
+            opacity: 0 !important;
+        }
+
+        #mensajeFinal {
+            position: absolute;
+            top: 45%;
+            width: 100%;
+            font-size: 2.5rem;
+            font-weight: extra-bold;
+            color: #ff6600;
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.5), 1px 1px 0 #fff;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px 0;
+            z-index: 5;
+        }
+
+        #efectoMagico {
+            position: absolute;
+            font-size: 4rem;
+            color: gold;
+            animation: brillar 0.7s ease-out;
+            pointer-events: none;
+            z-index: 99;
+        }
+        @keyframes brillar {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(2); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<audio id="musicaFondo" src="https://assets.mixkit.co/sfx/download/mixkit-happy-children-50.mp3" autoplay loop></audio>
+
+<div id="pantallaInicio">
+    <h1>🎉 Bienvenido al Mundo de las Vocales 🎈</h1>
+    <button id="btnComenzar">¡Vamos a jugar!</button>
+</div>
+
+<div id="instrucciones" style="display:none;">
+    <h2>👉 Toca la letra: <span id="objetivo"></span></h2>
+    <div class="marcadores">
+        <p>⏰ <span id="tiempo">20</span></p>
+        <p>⭐ <span id="puntos">0</span></p>
+    </div>
+</div>
+
+<button id="btnPausa" style="display:none;">🏠</button>
+
+<div id="zonaJuego" style="display:none;"></div>
+
+<div id="menuPausa" style="display:none;">
+    <div class="menu">
+        <h2>⏸ Juego en pausa</h2>
+        <button id="btnSeguir">▶️ Seguir jugando</button>
+        <button id="btnReiniciar">🔄 Volver al inicio</button>
+    </div>
+</div>
+
+<div id="mensajeFinal" style="display:none;"></div>
+
+<div id="efectoMagico" style="display:none;">✨</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const vocales = ["A", "E", "I", "O", "U"];
+        let letraObjetivo = "";
+        let puntos = 0;
+        let tiempo = 20;
+        let intervaloTiempo, intervaloBurbujas;
+        let juegoEnPausa = false;
+
+        const musicaFondo = document.getElementById('musicaFondo'); 
+
+        const pantallaInicio = document.getElementById("pantallaInicio");
+        const btnComenzar = document.getElementById("btnComenzar");
+        const instrucciones = document.getElementById("instrucciones");
+        const objetivo = document.getElementById("objetivo");
+        const tiempoEl = document.getElementById("tiempo");
+        const puntosEl = document.getElementById("puntos");
+        const zonaJuego = document.getElementById("zonaJuego");
+        const mensajeFinal = document.getElementById("mensajeFinal");
+        const btnPausa = document.getElementById("btnPausa");
+        const menuPausa = document.getElementById("menuPausa");
+        const btnSeguir = document.getElementById("btnSeguir");
+        const btnReiniciar = document.getElementById("btnReiniciar");
+        const efectoMagico = document.getElementById("efectoMagico");
+
+        // Enlazar los eventos de los botones
+        btnComenzar.addEventListener("click", iniciarJuego);
+        btnPausa.addEventListener("click", pausarJuego); 
+        btnSeguir.addEventListener("click", seguirJuego);
+        btnReiniciar.addEventListener("click", volverAlInicio);
+
+        function iniciarJuego() {
+            // Iniciar música y voz SÓLO después del clic del usuario
+            musicaFondo.play().catch(e => console.log("Música no pudo iniciar automáticamente."));
+            
+            puntos = 0;
+            puntosEl.textContent = puntos;
+            pantallaInicio.style.display = "none";
+            instrucciones.style.display = "block";
+            zonaJuego.style.display = "block";
+            btnPausa.style.display = "block";
+            menuPausa.style.display = "none"; 
+            juegoEnPausa = false;
+            nuevaRonda();
+        }
+
+        function nuevaRonda() {
+            zonaJuego.innerHTML = "";
+            mensajeFinal.style.display = "none";
+            tiempo = 20;
+            tiempoEl.textContent = tiempo;
+
+            letraObjetivo = vocales[Math.floor(Math.random() * vocales.length)];
+            objetivo.textContent = letraObjetivo;
+
+            // Opción de síntesis de voz (se ejecuta después del clic inicial)
+            if ('speechSynthesis' in window) {
+                if (!juegoEnPausa) {
+                    const mensaje = new SpeechSynthesisUtterance("Toca la letra " + letraObjetivo);
+                    mensaje.lang = "es-ES";
+                    speechSynthesis.speak(mensaje);
+                }
+            }
+
+            clearInterval(intervaloTiempo);
+            intervaloTiempo = setInterval(() => {
+                if (!juegoEnPausa) {
+                    tiempo--;
+                    tiempoEl.textContent = tiempo;
+                    if (tiempo <= 0) {
+                        clearInterval(intervaloTiempo);
+                        clearInterval(intervaloBurbujas);
+                        finDeRonda();
+                    }
+                }
+            }, 1000);
+
+            clearInterval(intervaloBurbujas);
+            intervaloBurbujas = setInterval(() => {
+                if (!juegoEnPausa) crearBurbuja();
+            }, 1000);
+        }
+
+        function colorAleatorio() {
+            const colores = ["#ff9999", "#99ff99", "#9999ff", "#ffff99", "#ffccff"];
+            return colores[Math.floor(Math.random() * colores.length)];
+        }
+
+        function crearBurbuja() {
+            const burbuja = document.createElement("div");
+            burbuja.className = "burbuja";
+
+            let letra;
+            if (Math.random() < 0.4) { 
+                letra = letraObjetivo;
+            } else {
+                do {
+                    letra = vocales[Math.floor(Math.random() * vocales.length)];
+                } while (letra === letraObjetivo);
+            }
+            burbuja.textContent = letra;
+
+            burbuja.style.setProperty('--bubble-color', colorAleatorio());
+            burbuja.style.left = Math.random() * (window.innerWidth - 120) + "px"; 
+            burbuja.style.top = Math.random() * (window.innerHeight - 120) + "px";
+
+            burbuja.addEventListener("click", function handler() {
+                burbuja.removeEventListener("click", handler);
+                if (letra === letraObjetivo) {
+                    puntos++;
+                    puntosEl.textContent = puntos;
+                    mostrarEfectoMagico(burbuja.getBoundingClientRect());
+                } else {
+                    tiempo = Math.max(0, tiempo - 2); 
+                }
+                burbuja.classList.add("explotar");
+                setTimeout(() => burbuja.remove(), 200);
+            });
+
+            zonaJuego.appendChild(burbuja);
+            setTimeout(() => {
+                if (zonaJuego.contains(burbuja) && !burbuja.classList.contains("explotar")) {
+                    burbuja.remove();
+                }
+            }, 7000); 
+        }
+
+        function mostrarEfectoMagico(rect) {
+            efectoMagico.style.display = "block";
+            efectoMagico.style.left = (rect.left + rect.width / 2 - 20) + "px";
+            efectoMagico.style.top = (rect.top + rect.height / 2 - 20) + "px";
+
+            efectoMagico.classList.remove("brillar");
+            void efectoMagico.offsetWidth;
+            efectoMagico.classList.add("brillar");
+
+            setTimeout(() => {
+                efectoMagico.style.display = "none";
+            }, 700);
+        }
+
+        function finDeRonda() {
+            let record = localStorage.getItem("record") || 0;
+            if (puntos > record) {
+                localStorage.setItem("record", puntos);
+                record = puntos;
+                mensajeFinal.textContent = `🎉 ¡NUEVO RÉCORD! ${puntos} Puntos! 🏆`;
+            } else {
+                mensajeFinal.textContent = `⏰ ¡Tiempo terminado! ⭐ Puntos: ${puntos} 🏆 Récord: ${record}`;
+            }
+            mensajeFinal.style.display = "block";
+            setTimeout(nuevaRonda, 3500); 
+        }
+
+        function pausarJuego() {
+            juegoEnPausa = true;
+            menuPausa.style.display = "flex";
+            clearInterval(intervaloTiempo);
+            clearInterval(intervaloBurbujas);
+            musicaFondo.pause(); 
+        }
+
+        function seguirJuego() {
+            menuPausa.style.display = "none";
+            juegoEnPausa = false;
+            
+            musicaFondo.play().catch(e => console.log("Música no pudo reanudar.")); 
+            
+            // Reiniciar temporizadores
+            intervaloTiempo = setInterval(() => {
+                if (!juegoEnPausa) {
+                    tiempo--;
+                    tiempoEl.textContent = tiempo;
+                    if (tiempo <= 0) {
+                        clearInterval(intervaloTiempo);
+                        clearInterval(intervaloBurbujas);
+                        finDeRonda();
+                    }
+                }
+            }, 1000);
+            
+            intervaloBurbujas = setInterval(() => {
+                if (!juegoEnPausa) crearBurbuja();
+            }, 1000);
+        }
+
+        function volverAlInicio() {
+            clearInterval(intervaloTiempo);
+            clearInterval(intervaloBurbujas);
+            juegoEnPausa = false;
+            menuPausa.style.display = "none";
+            zonaJuego.style.display = "none";
+            instrucciones.style.display = "none";
+            btnPausa.style.display = "none";
+            mensajeFinal.style.display = "none";
+            pantallaInicio.style.display = "flex";
+            musicaFondo.pause(); 
+            musicaFondo.currentTime = 0; 
+        }
+    });
+</script>
+</body>
+</html>
